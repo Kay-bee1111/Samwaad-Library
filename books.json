@@ -1,0 +1,25 @@
+{
+  "books": [
+    {
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+      "genre": "Classic",
+      "owner": "John Doe",
+      "status": "Available"
+    },
+    {
+      "title": "1984",
+      "author": "George Orwell",
+      "genre": "Science Fiction",
+      "owner": "Jane Smith",
+      "status": "Borrowed"
+    },
+    {
+      "title": "wuthering height",
+      "author": "emily bronte",
+      "genre": "fiction",
+      "owner": "krati",
+      "status": "Available"
+    }
+  ]
+}

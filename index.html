@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Samwaad Library</title>
+    <style>
+        /* Previous styles remain */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        #searchInput {
+            padding: 8px;
+            width: 200px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        #filterSelect {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        th:hover {
+            background-color: #45a049;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status-available {
+            color: green;
+            font-weight: bold;
+        }
+        .status-borrowed {
+            color: red;
+            font-weight: bold;
+        }
+        .header-buttons {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 14px;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .admin-btn {
+            background-color: #2196F3;
+        }
+        .request-btn {
+            background-color: #ff9800;
+        }
+        .button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>The Samwaad Library</h1>
+            <div class="header-buttons">
+                <a href="admin.html" class="button admin-btn">Admin Panel</a>
+                <a href="YOUR_GOOGLE_FORM_URL" target="_blank" class="button request-btn">Request Book</a>
+            </div>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search books...">
+            <select id="filterSelect">
+                <option value="all">All Status</option>
+                <option value="available">Available</option>
+                <option value="borrowed">Borrowed</option>
+            </select>
+        </div>
+
+        <div id="loading">Loading library data...</div>
+        <table id="libraryTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th data-sort="title">Title ↕</th>
+                    <th data-sort="author">Author ↕</th>
+                    <th data-sort="genre">Genre ↕</th>
+                    <th data-sort="owner">Owner ↕</th>
+                    <th data-sort="status">Status ↕</th>
+                </tr>
+            </thead>
+            <tbody id="libraryTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Previous JavaScript remains the same -->
+    <script>
+        // Previous JavaScript code remains unchanged
+        let books = [];
+        let sortDirection = {};
+
+        async function loadLibraryData() {
+            try {
+                const response = await fetch('books.json');
+                if (!response.ok) {
+                    throw new Error('Failed to load library data');
+                }
+                const data = await response.json();
+                books = data.books;
+                displayBooks(books);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('libraryTable').style.display = 'table';
+            } catch (error) {
+                console.error('Error loading library data:', error);
+                document.getElementById('loading').className = 'error';
+                document.getElementById('loading').textContent = 'Error loading library data. Please try again.';
+            }
+        }
+
+        function displayBooks(booksToDisplay) {
+            const tableBody = document.getElementById('libraryTableBody');
+            tableBody.innerHTML = '';
+
+            booksToDisplay.forEach(book => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.genre}</td>
+                    <td>${book.owner}</td>
+                    <td class="status-${book.status.toLowerCase()}">${book.status}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function filterBooks() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('filterSelect').value;
+
+            let filteredBooks = books.filter(book => {
+                const matchesSearch = Object.values(book).some(value => 
+                    value.toLowerCase().includes(searchTerm)
+                );
+                const matchesStatus = statusFilter === 'all' || 
+                    book.status.toLowerCase() === statusFilter;
+                return matchesSearch && matchesStatus;
+            });
+
+            displayBooks(filteredBooks);
+        }
+
+        function sortBooks(column) {
+            sortDirection[column] = !sortDirection[column];
+            
+            const sortedBooks = [...books].sort((a, b) => {
+                let comparison = a[column].localeCompare(b[column]);
+                return sortDirection[column] ? comparison : -comparison;
+            });
+            
+            displayBooks(sortedBooks);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', filterBooks);
+        document.getElementById('filterSelect').addEventListener('change', filterBooks);
+        
+        document.querySelectorAll('th[data-sort]').forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.dataset.sort;
+                sortBooks(column);
+            });
+        });
+
+        loadLibraryData();
+    </script>
+</body>
+</html>
