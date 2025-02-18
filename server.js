@@ -8,7 +8,6 @@ const PORT = process.env.PORT || 3000;
 // MongoDB Connection String (Replace with your credentials)
 const MONGO_URI = 'mongodb+srv://bhardwajkrati20:EEMNcPH7sZS6m0qC@cluster0.nb3j4.mongodb.net/library?retryWrites=true&w=majority&appName=Cluster0';
 
-// Connect to MongoDB
 mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('✅ Connected to MongoDB'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
@@ -28,7 +27,7 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ API: Fetch Books from MongoDB
-app.get('/books', async (req, res) => {
+app.get('/api/books', async (req, res) => {
     try {
         const books = await Book.find();
         res.status(200).json({ books });
@@ -38,7 +37,7 @@ app.get('/books', async (req, res) => {
 });
 
 // ✅ API: Add or Update Books
-app.post('/update-books', async (req, res) => {
+app.post('/api/update-books', async (req, res) => {
     try {
         await Book.deleteMany();  // Clear existing books
         await Book.insertMany(req.body.books);  // Insert new books
@@ -48,6 +47,10 @@ app.post('/update-books', async (req, res) => {
     }
 });
 
-// Start Local Server
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// Start Server (For Local Testing)
+if (require.main === module) {
+    app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+}
 
+// ✅ Export for Vercel Deployment
+module.exports = app;
