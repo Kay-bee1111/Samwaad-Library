@@ -5,7 +5,7 @@
       "author": "F. Scott Fitzgerald",
       "genre": "Classic",
       "owner": "John Doe",
-      "status": "Available"
+      "status": "Borrowed"
     },
     {
       "title": "1984",
@@ -15,8 +15,8 @@
       "status": "Borrowed"
     },
     {
-      "title": "wuthering height",
-      "author": "emily bronte",
+      "title": "pride and prejudice",
+      "author": "jane austen",
       "genre": "fiction",
       "owner": "krati",
       "status": "Available"
